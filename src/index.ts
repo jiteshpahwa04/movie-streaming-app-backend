@@ -1,13 +1,11 @@
 import express, { type Request, type Response, type Express } from 'express';
+import { PORT } from './config/server.config.js';
+import apiRouter from './routes/index.js';
 
 const app: Express = express();
 
-app.get('/ping', (_req: Request, res: Response) => { // If we add _ before req, it tells TS that we are intentionally not using this parameter, so no warnings will be shown. We can also use just the _ alone.
-    res.status(200).json({
-        message: 'pong',
-    });
-});
+app.use('/api', apiRouter);
 
-app.listen(3000, () => {
-  console.log('Server is running on port 3000');
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
