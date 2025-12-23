@@ -1,5 +1,6 @@
 import fs from 'fs';
 import ffmpeg from 'fluent-ffmpeg';
+import { createMovie, updateMovieStatus } from '../repositories/movie.repository';
 
 interface Resolution {
     width: number;
@@ -20,6 +21,9 @@ export const processVideoForHLS = (
     outputPath: string, 
     callback: (error: Error | null, masterPlaylist?: string) => void
 ): void => {
+
+    createMovie(outputPath);
+
     fs.mkdirSync(outputPath, { recursive: true }); // Create output directory if it doesn't exist
 
     const masterPlaylist = `${outputPath}/master.m3u8`; // Path to the master playlist file
@@ -53,6 +57,8 @@ export const processVideoForHLS = (
                     console.log('All variants processed. Writing master playlist.');
                     fs.writeFileSync(masterPlaylist, `#EXTM3U\n${masterContent.join('\n')}`);
                     callback(null, masterPlaylist); // Call the callback with the path to the master playlist
+
+                    updateMovieStatus(outputPath, "COMPLETED");
                 }
             })
             .on('error', (err) => {
